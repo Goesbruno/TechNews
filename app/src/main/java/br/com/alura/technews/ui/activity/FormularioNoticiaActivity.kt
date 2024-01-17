@@ -14,6 +14,8 @@ import br.com.alura.technews.repository.NoticiaRepository
 import br.com.alura.technews.ui.activity.extensions.mostraErro
 import br.com.alura.technews.ui.viewmodel.FormularioNoticiaViewModel
 import br.com.alura.technews.ui.viewmodel.factory.FormularioNoticiaViewModelFactory
+import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 
 private const val TITULO_APPBAR_EDICAO = "Editando notícia"
@@ -27,12 +29,7 @@ class FormularioNoticiaActivity : AppCompatActivity() {
         intent.getLongExtra(NOTICIA_ID_CHAVE, 0)
     }
 
-    private val viewModel by lazy {
-        val repository = NoticiaRepository(AppDatabase.getInstance(this).noticiaDAO)
-        val factory = FormularioNoticiaViewModelFactory(repository)
-        ViewModelProvider(this, factory)
-            .get(FormularioNoticiaViewModel::class.java)
-    }
+    private val viewModel by viewModel<FormularioNoticiaViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
