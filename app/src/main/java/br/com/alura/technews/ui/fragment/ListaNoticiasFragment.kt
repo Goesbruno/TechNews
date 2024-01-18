@@ -68,7 +68,7 @@ class ListaNoticiasFragment : Fragment() {
     }
 
     private fun buscaNoticias() {
-        // No método observe o lifecycle Owner será a própria activity
+        // No método observe o lifecycle Owner será o próprio fragment
         //O Observer irá checar se houve mudança na lista do LiveData e irá executar a atualização do adapter
         viewModel.buscaTodos().observe(this, Observer { resource ->
             resource.dado?.let { adapter.atualiza(it) }
