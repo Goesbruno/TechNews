@@ -12,7 +12,7 @@ plugins {
     id('kotlin-kapt')
     id("com.google.devtools.ksp") version "1.8.10-1.0.9"
 }
-
+//
 android {
     namespace 'br.com.alura.technews'
     compileSdkVersion 33
@@ -69,5 +69,9 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.3'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3'
-    //3.13.1
+
+    //Koin
+    implementation 'org.koin:koin-android:2.0.0-rc-2'
+    implementation 'org.koin:koin-android-viewmodel:2.0.0-rc-2'
+
 }

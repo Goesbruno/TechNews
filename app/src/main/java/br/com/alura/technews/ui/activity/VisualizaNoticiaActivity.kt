@@ -2,37 +2,23 @@ package br.com.alura.technews.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
+import androidx.fragment.app.FragmentOnAttachListener
 import br.com.alura.technews.R
-import br.com.alura.technews.database.AppDatabase
 import br.com.alura.technews.databinding.ActivityVisualizaNoticiaBinding
-import br.com.alura.technews.model.Noticia
-import br.com.alura.technews.repository.NoticiaRepository
-import br.com.alura.technews.ui.activity.extensions.mostraErro
-import br.com.alura.technews.ui.viewmodel.VisualizaNoticiaViewModel
-import br.com.alura.technews.ui.viewmodel.factory.VisualizaNoticiaViewModelFactory
+import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
 
-private const val NOTICIA_NAO_ENCONTRADA = "Notícia não encontrada"
 private const val TITULO_APPBAR = "Notícia"
-private const val MENSAGEM_FALHA_REMOCAO = "Não foi possível remover notícia"
+
 private lateinit var binding: ActivityVisualizaNoticiaBinding
 
 class VisualizaNoticiaActivity : AppCompatActivity() {
 
+    private val fragmentManager = supportFragmentManager
+
     private val noticiaId: Long by lazy {
         intent.getLongExtra(NOTICIA_ID_CHAVE, 0)
-    }
-
-    private val viewModel by lazy {
-        val repository = NoticiaRepository(AppDatabase.getInstance(this).noticiaDAO)
-        val factory = VisualizaNoticiaViewModelFactory(noticiaId, repository)
-        ViewModelProvider(this, factory).get(VisualizaNoticiaViewModel::class.java)
     }
 
 
@@ -41,53 +27,34 @@ class VisualizaNoticiaActivity : AppCompatActivity() {
         binding = ActivityVisualizaNoticiaBinding.inflate(layoutInflater)
         setContentView(binding.root)
         title = TITULO_APPBAR
-        verificaIdDaNoticia()
-        buscaNoticiaSelecionada()
+        configuraFragment()
+        configuraListenerFragment()
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.visualiza_noticia_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item?.itemId) {
-            R.id.visualiza_noticia_menu_edita -> abreFormularioEdicao()
-            R.id.visualiza_noticia_menu_remove -> remove()
-        }
-        return super.onOptionsItemSelected(item!!)
-    }
-
-    private fun buscaNoticiaSelecionada() {
-        viewModel.noticiaEncontrada.observe(this, Observer { noticiaEncontrada ->
-            noticiaEncontrada?.let {
-                preencheCampos(it)
+    private fun configuraListenerFragment() {
+        val listener = FragmentOnAttachListener { fragmentManager, fragment ->
+            if (fragment is VisualizaNoticiaFragment) {
+                fragment.quandoFinalizaTela = { finish() }
+                fragment.quandoSelecionaMenuEdicao = { abreFormularioEdicao() }
             }
-        })
-    }
-
-    private fun verificaIdDaNoticia() {
-        if (noticiaId == 0L) {
-            mostraErro(NOTICIA_NAO_ENCONTRADA)
-            finish()
         }
+        fragmentManager.addFragmentOnAttachListener(listener)
     }
 
-    private fun preencheCampos(noticia: Noticia) {
-        binding.activityVisualizaNoticiaTitulo.text = noticia.titulo
-        binding.activityVisualizaNoticiaTexto.text = noticia.texto
-    }
+    private fun configuraFragment() {
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val fragment = VisualizaNoticiaFragment()
+        //Criando um instância de Bundle para conter os argumentos que devem ser enviados
+        val bundle = Bundle()
+        bundle.putLong(NOTICIA_ID_CHAVE, noticiaId)
+        //Enviando o bundle para o fragment a partir dos seus arguments
+        fragment.arguments = bundle
 
-    private fun remove() {
-        viewModel.remove().observe(this, Observer {
-            if (it.erro == null) {
-                finish()
-            } else {
-                mostraErro(MENSAGEM_FALHA_REMOCAO)
-            }
-        })
-
+        fragmentTransaction.add(
+            R.id.activity_visualiza_noticia_container,
+            fragment
+        )
+        fragmentTransaction.commit()
     }
 
 
