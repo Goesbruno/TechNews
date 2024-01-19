@@ -1,6 +1,7 @@
 package br.com.alura.technews.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -26,7 +27,8 @@ class VisualizaNoticiaFragment : Fragment() {
     private lateinit var binding: VisualizaNoticiaBinding
 
     private val noticiaId: Long by lazy {
-        arguments?.getLong(NOTICIA_ID_CHAVE) ?: throw IllegalArgumentException("Id Inválido")
+        //Método específico para receber arguments enviados para o fragment a partir do Bundle
+        requireArguments().getLong(NOTICIA_ID_CHAVE)
     }
 
     private val viewModel: VisualizaNoticiaViewModel by viewModel {
@@ -43,6 +45,7 @@ class VisualizaNoticiaFragment : Fragment() {
         super.onCreate(savedInstanceState)
         //implementação para ativar o uso de options menu no fragment
         setHasOptionsMenu(true)
+
     }
 
     override fun onCreateView(

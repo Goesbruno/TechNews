@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentOnAttachListener
 import br.com.alura.technews.R
 import br.com.alura.technews.databinding.ActivityVisualizaNoticiaBinding
-import br.com.alura.technews.ui.fragment.ListaNoticiasFragment
 import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
 
@@ -43,12 +42,19 @@ class VisualizaNoticiaActivity : AppCompatActivity() {
     }
 
     private fun configuraFragment() {
-        val fragmentTrasaction = fragmentManager.beginTransaction()
-        fragmentTrasaction.replace(
-            R.id.activity_visualiza_noticia_fragment,
-            VisualizaNoticiaFragment()
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val fragment = VisualizaNoticiaFragment()
+        //Criando um instância de Bundle para conter os argumentos que devem ser enviados
+        val bundle = Bundle()
+        bundle.putLong(NOTICIA_ID_CHAVE, noticiaId)
+        //Enviando o bundle para o fragment a partir dos seus arguments
+        fragment.arguments = bundle
+
+        fragmentTransaction.add(
+            R.id.activity_visualiza_noticia_container,
+            fragment
         )
-        fragmentTrasaction.commit()
+        fragmentTransaction.commit()
     }
 
 
