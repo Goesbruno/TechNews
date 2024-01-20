@@ -2,14 +2,10 @@ package br.com.alura.technews.ui.recyclerview.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import br.com.alura.technews.R
-import br.com.alura.technews.databinding.ActivityVisualizaNoticiaBinding
 import br.com.alura.technews.databinding.ItemNoticiaBinding
 import br.com.alura.technews.model.Noticia
-import java.lang.reflect.Type
 
 
 class ListaNoticiasAdapter(

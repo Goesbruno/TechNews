@@ -2,11 +2,11 @@ package br.com.alura.technews.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentOnAttachListener
 import br.com.alura.technews.R
 import br.com.alura.technews.model.Noticia
+import br.com.alura.technews.ui.activity.extensions.transacaoFragment
 import br.com.alura.technews.ui.fragment.ListaNoticiasFragment
 import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
@@ -21,30 +21,45 @@ class NoticiasActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_noticias)
         title = TITULO_APPBAR
-        configuraFragment()
-        configuraListenerDoFragment()
+        configuraFragmentInicial()
+        configuraListenerDosFragments()
     }
 
-    private fun configuraListenerDoFragment() {
+
+    private fun configuraFragmentInicial() {
+        transacaoFragment {
+            add(R.id.activity_noticias_container, ListaNoticiasFragment())
+        }
+    }
+
+    //Responsável por configurar os comportamentos de listener dos fragments utilizados
+    private fun configuraListenerDosFragments() {
         val listener = FragmentOnAttachListener { fragmentManager, fragment ->
-            if (fragment is ListaNoticiasFragment) {
-                fragment.quandoNoticiaSeleciona = {abreVisualizadorNoticia(it)}
-                fragment.quandoFabSalvaNoticiaClicado = {abreFormularioModoCriacao()}
-            }
-            if (fragment is VisualizaNoticiaFragment) {
-                fragment.quandoFinalizaTela = { finish() }
-                fragment.quandoSelecionaMenuEdicao = {noticiaSelecionada ->
-                    abreFormularioEdicao(noticiaSelecionada)}
+            when (fragment) {
+                is ListaNoticiasFragment -> {
+                    configuraListaNoticias(fragment)
+                }
+
+                is VisualizaNoticiaFragment -> {
+                    configuraVisualizaNoticias(fragment)
+                }
             }
         }
         fragmentManager.addFragmentOnAttachListener(listener)
     }
 
-    private fun configuraFragment() {
-        val fragmentTrasaction = fragmentManager.beginTransaction()
+    //Comportamentos específicos do fragment VisualizaNoticia
+    private fun configuraVisualizaNoticias(fragment: VisualizaNoticiaFragment) {
+        fragment.quandoFinalizaTela = this::finish
+        fragment.quandoSelecionaMenuEdicao = { noticiaSelecionada ->
+            abreFormularioEdicao(noticiaSelecionada)
+        }
+    }
 
-        fragmentTrasaction.add(R.id.activity_noticias_container, ListaNoticiasFragment())
-        fragmentTrasaction.commit()
+    //Comportamentos específicos do fragment ListaNoticias
+    private fun configuraListaNoticias(fragment: ListaNoticiasFragment) {
+        fragment.quandoNoticiaSeleciona = this::abreVisualizadorNoticia
+        fragment.quandoFabSalvaNoticiaClicado = this::abreFormularioModoCriacao
     }
 
 
@@ -53,20 +68,21 @@ class NoticiasActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    //Reponsável por substituir o fragment inicial pelo VisualizaNoticias
     private fun abreVisualizadorNoticia(noticia: Noticia) {
-        val fragmentTransaction = fragmentManager.beginTransaction()
         val fragment = VisualizaNoticiaFragment()
         //Criando um instância de Bundle para conter os argumentos que devem ser enviados
         val bundle = Bundle()
         bundle.putLong(NOTICIA_ID_CHAVE, noticia.id)
         //Enviando o bundle para o fragment a partir dos seus arguments
         fragment.arguments = bundle
-        fragmentTransaction.replace(
-            R.id.activity_noticias_container,
-            fragment
-        )
-        fragmentTransaction.commit()
+
+        transacaoFragment {
+            replace(R.id.activity_noticias_container, fragment)
+        }
     }
+
+
 
     private fun abreFormularioEdicao(noticia: Noticia) {
         val intent = Intent(this, FormularioNoticiaActivity::class.java)
