@@ -21,6 +21,7 @@ import org.koin.core.parameter.parametersOf
 
 private const val NOTICIA_NAO_ENCONTRADA = "Notícia não encontrada"
 private const val MENSAGEM_FALHA_REMOCAO = "Não foi possível remover notícia"
+private const val TITULO_APPBAR = "Notícia"
 
 class VisualizaNoticiaFragment : Fragment() {
 
@@ -36,7 +37,8 @@ class VisualizaNoticiaFragment : Fragment() {
     }
 
     //Função para acionar o comportamento de transição de tela por meio da Activity
-    var quandoSelecionaMenuEdicao: (noticia: Noticia) -> Unit = {}
+    var quandoSelecionaMenuEdicao: (noticia: Noticia) -> Unit = {
+    }
 
     //função para acionar o "finish()" por meio da Activity
     var quandoFinalizaTela: () -> Unit = {}
@@ -46,19 +48,22 @@ class VisualizaNoticiaFragment : Fragment() {
         //implementação para ativar o uso de options menu no fragment
         setHasOptionsMenu(true)
 
+
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = VisualizaNoticiaBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.title = TITULO_APPBAR
         buscaNoticiaSelecionada()
         verificaIdDaNoticia()
 
@@ -81,12 +86,12 @@ class VisualizaNoticiaFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item?.itemId) {
             R.id.visualiza_noticia_menu_edita -> {
-
-                viewModel.noticiaEncontrada.value?.let {quandoSelecionaMenuEdicao}
+                val noticiaEncontrada = viewModel.noticiaEncontrada.value
+                noticiaEncontrada?.let { quandoSelecionaMenuEdicao(it) }
             }
             R.id.visualiza_noticia_menu_remove -> remove()
         }
-        return super.onOptionsItemSelected(item!!)
+        return super.onOptionsItemSelected(item)
     }
 
     private fun verificaIdDaNoticia() {

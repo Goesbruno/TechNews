@@ -14,6 +14,7 @@ import br.com.alura.technews.ui.recyclerview.adapter.ListaNoticiasAdapter
 import br.com.alura.technews.ui.viewmodel.ListaNoticiasViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
+private const val TITULO_APPBAR = "Notícias"
 private const val MENSAGEM_FALHA_CARREGAR_NOTICIAS = "Não foi possível carregar as novas notícias"
 class ListaNoticiasFragment : Fragment() {
 
@@ -33,6 +34,7 @@ class ListaNoticiasFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         buscaNoticias()
+
     }
 
     override fun onCreateView(
@@ -46,6 +48,7 @@ class ListaNoticiasFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.title = TITULO_APPBAR
         configuraRecyclerView()
         configuraFabAdicionaNoticia()
     }

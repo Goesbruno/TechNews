@@ -2,6 +2,7 @@ package br.com.alura.technews.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentOnAttachListener
 import br.com.alura.technews.R
@@ -11,7 +12,7 @@ import br.com.alura.technews.ui.fragment.ListaNoticiasFragment
 import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
 
-private const val TITULO_APPBAR = "Notícias"
+
 
 class NoticiasActivity : AppCompatActivity() {
 
@@ -20,8 +21,14 @@ class NoticiasActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_noticias)
-        title = TITULO_APPBAR
-        configuraFragmentInicial()
+
+
+        //Verificação do savedInstanceState para garantir que a transação de fragment
+        // só ocorrerá caso seja a primeira execução do onCreate
+        if (savedInstanceState == null) {
+            configuraFragmentInicial()
+        }
+
         configuraListenerDosFragments()
     }
 
@@ -78,11 +85,11 @@ class NoticiasActivity : AppCompatActivity() {
         fragment.arguments = bundle
 
         transacaoFragment {
+            //addToBackStack adiciona o fragment anterior a pilha de retorno
+            addToBackStack(null)
             replace(R.id.activity_noticias_container, fragment)
         }
     }
-
-
 
     private fun abreFormularioEdicao(noticia: Noticia) {
         val intent = Intent(this, FormularioNoticiaActivity::class.java)
