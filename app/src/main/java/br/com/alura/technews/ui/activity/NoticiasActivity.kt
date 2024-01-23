@@ -1,8 +1,8 @@
 package br.com.alura.technews.ui.activity
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentOnAttachListener
 import br.com.alura.technews.R
@@ -12,7 +12,7 @@ import br.com.alura.technews.ui.fragment.ListaNoticiasFragment
 import br.com.alura.technews.ui.fragment.VisualizaNoticiaFragment
 
 
-
+private const val TAG_FRAGMENT_VISUALIZA_NOTICIA = "visualizaNoticia"
 
 class NoticiasActivity : AppCompatActivity() {
 
@@ -27,6 +27,38 @@ class NoticiasActivity : AppCompatActivity() {
         // só ocorrerá caso seja a primeira execução do onCreate
         if (savedInstanceState == null) {
             configuraFragmentInicial()
+        } else {
+            //Encontrando o fragment atual pelo ID
+            supportFragmentManager
+                .findFragmentByTag(TAG_FRAGMENT_VISUALIZA_NOTICIA)?.let { fragment ->
+                    val argumentos = fragment.arguments
+                    val novoFragment = VisualizaNoticiaFragment()
+                    //Os argumentos do fragment serão copiados e colocados em um novo fragment igual
+                    // pois não é possível reaproveitar o mesmo fragment em um container diferente
+                    novoFragment.arguments = argumentos
+                    //Transação exclusiva para remover o fragment antigo e evitar sobreposição
+                    transacaoFragment {
+                        remove(fragment)
+                    }
+                    //acionando a backstack para fazer com que o fragment de lista apareça ao
+                    // rotacionar a tela estando na tela de visualização de noticia
+                    supportFragmentManager.popBackStack()
+
+                    //Transação que irá criar o novo fragment no container primario
+                    transacaoFragment {
+                        //Verificação da orientação do dispositivo para definir qual layout será usado na transação
+                        val container =
+                            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                R.id.activity_noticias_container_secundario
+                            } else {
+                                //addToBackStack adiciona o fragment anterior a pilha de retorno
+                                addToBackStack(null)
+                                R.id.activity_noticias_container_primario
+                            }
+                        //Um novo fragment identico ao anterior é criado porém em um container diferente
+                        replace(container, novoFragment, TAG_FRAGMENT_VISUALIZA_NOTICIA)
+                    }
+                }
         }
 
         configuraListenerDosFragments()
@@ -35,7 +67,7 @@ class NoticiasActivity : AppCompatActivity() {
 
     private fun configuraFragmentInicial() {
         transacaoFragment {
-            add(R.id.activity_noticias_container, ListaNoticiasFragment())
+            add(R.id.activity_noticias_container_primario, ListaNoticiasFragment())
         }
     }
 
@@ -85,9 +117,16 @@ class NoticiasActivity : AppCompatActivity() {
         fragment.arguments = bundle
 
         transacaoFragment {
-            //addToBackStack adiciona o fragment anterior a pilha de retorno
-            addToBackStack(null)
-            replace(R.id.activity_noticias_container, fragment)
+            //Verificação da orientação do dispositivo para definir qual layout será usado na transação
+            val container =
+                if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    R.id.activity_noticias_container_secundario
+                } else {
+                    //addToBackStack adiciona o fragment anterior a pilha de retorno
+                    addToBackStack(null)
+                    R.id.activity_noticias_container_primario
+                }
+            replace(container, fragment, TAG_FRAGMENT_VISUALIZA_NOTICIA)
         }
     }
 
