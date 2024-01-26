@@ -45,10 +45,9 @@ class VisualizaNoticiaFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("Teste", "onCreate do Fragment chamado")
         //implementação para ativar o uso de options menu no fragment
         setHasOptionsMenu(true)
-
-
 
     }
 
