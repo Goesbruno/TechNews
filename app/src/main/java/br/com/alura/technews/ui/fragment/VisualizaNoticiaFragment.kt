@@ -1,7 +1,6 @@
 package br.com.alura.technews.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -14,6 +13,7 @@ import br.com.alura.technews.R
 import br.com.alura.technews.databinding.VisualizaNoticiaBinding
 import br.com.alura.technews.model.Noticia
 import br.com.alura.technews.ui.activity.NOTICIA_ID_CHAVE
+import br.com.alura.technews.ui.fragment.extensions.mostraErro
 import br.com.alura.technews.ui.viewmodel.VisualizaNoticiaViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -36,13 +36,14 @@ class VisualizaNoticiaFragment : Fragment() {
     }
 
     //Função para acionar o comportamento de transição de tela por meio da Activity
-    var quandoSelecionaMenuEdicao: () -> Unit = {}
+    var quandoSelecionaMenuEdicao: (noticiaId: Long) -> Unit = {}
 
     //função para acionar o "finish()" por meio da Activity
     var quandoFinalizaTela: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         //implementação para ativar o uso de options menu no fragment
         setHasOptionsMenu(true)
 
@@ -80,7 +81,7 @@ class VisualizaNoticiaFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item?.itemId) {
-            R.id.visualiza_noticia_menu_edita -> quandoSelecionaMenuEdicao()
+            R.id.visualiza_noticia_menu_edita -> quandoSelecionaMenuEdicao(noticiaId)
             R.id.visualiza_noticia_menu_remove -> remove()
         }
         return super.onOptionsItemSelected(item!!)
